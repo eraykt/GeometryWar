@@ -117,6 +117,7 @@ void Game::spawnPlayer()
 		m_playerConfig.OT);
 
 	entity->cInput = std::make_shared<CInput>();
+	entity->cCollision = std::make_shared<CCollision>(m_playerConfig.CR);
 
 	m_player = entity;
 }
@@ -127,9 +128,11 @@ void Game::spawnEnemy()
 	sf::Color fillColor(getRandomInt(0, 255), getRandomInt(0, 255), getRandomInt(0, 255));
 	sf::Color outlineColor(m_enemyConfig.OR, m_enemyConfig.OG, m_enemyConfig.OB);
 	Vec2 velocity(getRandomFloat(m_enemyConfig.SMIN, m_enemyConfig.SMAX), getRandomFloat(m_enemyConfig.SMIN, m_enemyConfig.SMAX));
+
 	auto e = m_entities.addEntity("enemy");
 	e->cTransform = std::make_shared<CTransform>(getRandomPositionInBorder(m_enemyConfig.CR), velocity, 0.0f);
 	e->cShape = std::make_shared<CShape>(m_enemyConfig.SR, enemyVerticle, fillColor, outlineColor, m_enemyConfig.OT);
+	e->cCollision = std::make_shared<CCollision>(m_enemyConfig.CR);
 
 	// record when the most recent enemy was spawned
 	m_lastEnemySpawnTime = m_currentFrame;
@@ -201,6 +204,43 @@ void Game::sCollision()
 //        }
 //        // we need another loop for small entities because small entities don't spawn further
 //    }
+
+	// Player border clamp
+	auto playerPos = m_player->cTransform->pos;
+	auto playerRadius = m_player->cCollision->radius;
+
+	if (playerPos.x < playerRadius) { playerPos.x = playerRadius; }
+	else if (playerPos.x + playerRadius > m_windowConfig.W) { playerPos.x = m_windowConfig.W - playerRadius; }
+	if (playerPos.y < playerRadius) { playerPos.y = playerRadius; }
+	else if (playerPos.y + playerRadius > m_windowConfig.H) { playerPos.y = m_windowConfig.H - playerRadius; }
+
+
+	// Enemy border clamp
+	for (auto& e : m_entities.getEntities("enemy"))
+	{
+		if (e->cTransform->pos.x < e->cCollision->radius)
+		{
+			e->cTransform->velocity.x *= -1.0f;
+			e->cTransform->pos.x = e->cCollision->radius;
+		}
+		else if (e->cTransform->pos.x + e->cCollision->radius > m_windowConfig.W)
+		{
+			e->cTransform->velocity.x *= -1.0f;
+			e->cTransform->pos.x = m_windowConfig.W - e->cCollision->radius;
+		}
+
+		if (e->cTransform->pos.y < e->cCollision->radius)
+		{
+			e->cTransform->velocity.y *= -1.0f;
+			e->cTransform->pos.y = e->cCollision->radius;
+		}
+		else if (e->cTransform->pos.y + e->cCollision->radius > m_windowConfig.H)
+		{
+			e->cTransform->velocity.y *= -1.0f;
+			e->cTransform->pos.y = m_windowConfig.H - e->cCollision->radius;
+		}
+	}
+
 }
 
 void Game::sEnemySpawner()
