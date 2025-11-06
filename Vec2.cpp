@@ -60,20 +60,3 @@ float Vec2::dist(const Vec2 &rhs) const {
 float Vec2::length() const {
     return std::sqrt(x * x + y * y);
 }
-
-
-// int main(int argc, char * argv[])
-// {
-// Vec2 v1(100, 100);
-// Vec2 v2(200, 200);
-
-// v1.add(v2).scale(2).add(v2);
-
-// std::cout << v1.x << ", " << v1.y << "\n";
-// std::cout << v1.dist(v2) << "\n";
-// std::cout << v1.length() << "\n";
-// std::cout << (v1 == v2) << "\n";
-// std::cout << (v1 == v1) << "\n";
-
-// return 0;
-// }
