@@ -24,6 +24,7 @@
     <ProjectGuid>{d3945036-9337-4b79-8cd7-99fcea4cc89e}</ProjectGuid>
     <RootNamespace>sfmlimguitemplate</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <ProjectName>GeometryWar</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -129,13 +130,24 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Entity.cpp" />
+    <ClCompile Include="EntityManager.cpp" />
     <ClCompile Include="External\ImGui-SFML\Source\imgui-SFML.cpp" />
     <ClCompile Include="External\ImGui\Source\imgui.cpp" />
     <ClCompile Include="External\ImGui\Source\imgui_demo.cpp" />
     <ClCompile Include="External\ImGui\Source\imgui_draw.cpp" />
     <ClCompile Include="External\ImGui\Source\imgui_tables.cpp" />
     <ClCompile Include="External\ImGui\Source\imgui_widgets.cpp" />
+    <ClCompile Include="Game.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Vec2.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Components.h" />
+    <ClInclude Include="Entity.h" />
+    <ClInclude Include="EntityManager.h" />
+    <ClInclude Include="Game.h" />
+    <ClInclude Include="Vec2.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
