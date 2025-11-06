@@ -81,6 +81,8 @@ public:
 	void spawnBullet(std::shared_ptr<Entity> entity, const Vec2& target);
 
 	void spawnSpecialWeapon(std::shared_ptr<Entity> entity);
+
+	int getRandomInt(int min, int max) const;
 };
 
 #endif //GAME_H
