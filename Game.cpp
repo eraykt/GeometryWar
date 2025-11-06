@@ -121,17 +121,16 @@ void Game::spawnPlayer()
 	m_player = entity;
 }
 
-// spawn an enemy at a random position
 void Game::spawnEnemy()
 {
-	// TODO:
-	// make sure the enemy is spawned properly with the m_enemyConfig variables
-	// the enemy must be spawned completely within the bounds of the window
-
+	int enemyVerticle = getRandomInt(m_enemyConfig.VMIN, m_enemyConfig.VMAX);
+	sf::Color fillColor(getRandomInt(0, 255), getRandomInt(0, 255), getRandomInt(0, 255));
+	sf::Color outlineColor(m_enemyConfig.OR, m_enemyConfig.OG, m_enemyConfig.OB);
+	Vec2 velocity(getRandomFloat(m_enemyConfig.SMIN, m_enemyConfig.SMAX), getRandomFloat(m_enemyConfig.SMIN, m_enemyConfig.SMAX));
 	auto e = m_entities.addEntity("enemy");
-	e->cTransform = std::make_shared<CTransform>(Vec2(300.0f, 300.0f), Vec2(1.0f, 1.0f), 0.0f);
-	e->cShape = std::make_shared<CShape>(32.0f, 8, sf::Color::Green, sf::Color::Black, 4.0f);
-	std::cout << "spawne\n";
+	e->cTransform = std::make_shared<CTransform>(getRandomPositionInBorder(m_enemyConfig.CR), velocity, 0.0f);
+	e->cShape = std::make_shared<CShape>(m_enemyConfig.SR, enemyVerticle, fillColor, outlineColor, m_enemyConfig.OT);
+
 	// record when the most recent enemy was spawned
 	m_lastEnemySpawnTime = m_currentFrame;
 }
@@ -168,22 +167,8 @@ void Game::sMovement()
 		{
 			if (e->cInput)
 			{
-				if (e->cInput->up)
-				{
-					m_player->cTransform->pos.y -= m_player->cTransform->velocity.y;
-				}
-				if (e->cInput->down)
-				{
-					m_player->cTransform->pos.y += m_player->cTransform->velocity.y;
-				}
-				if (e->cInput->left)
-				{
-					m_player->cTransform->pos.x -= m_player->cTransform->velocity.x;
-				}
-				if (e->cInput->right)
-				{
-					m_player->cTransform->pos.x += m_player->cTransform->velocity.x;
-				}
+				e->cTransform->pos.x += e->cInput->inputAxis.normalize().x * e->cTransform->velocity.x;
+				e->cTransform->pos.y += e->cInput->inputAxis.normalize().y * e->cTransform->velocity.y;
 			}
 
 			else
@@ -271,54 +256,13 @@ void Game::sUserInput()
 			m_running = false;
 		}
 
-		if (event.type == sf::Event::KeyPressed)
-		{
-			switch (event.key.code)
-			{
-			case sf::Keyboard::W:
-				m_player->cInput->up = true;
-				break;
+		auto& input = m_player->cInput;
+		input->inputAxis = { 0.0f, 0.0f };
 
-			case sf::Keyboard::S:
-				m_player->cInput->down = true;
-				break;
-
-			case sf::Keyboard::A:
-				m_player->cInput->left = true;
-				break;
-
-			case sf::Keyboard::D:
-				m_player->cInput->right = true;
-				break;
-			default:
-				break;
-			}
-		}
-
-		if (event.type == sf::Event::KeyReleased)
-		{
-			switch (event.key.code)
-			{
-			case sf::Keyboard::W:
-				m_player->cInput->up = false;
-				break;
-
-			case sf::Keyboard::S:
-				m_player->cInput->down = false;
-				break;
-
-			case sf::Keyboard::A:
-				m_player->cInput->left = false;
-				break;
-
-			case sf::Keyboard::D:
-				m_player->cInput->right = false;
-				break;
-
-			default:
-				break;
-			}
-		}
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::W)) { input->inputAxis.y -= 1.0f; }
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::S)) { input->inputAxis.y += 1.0f; }
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::A)) { input->inputAxis.x -= 1.0f; }
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) { input->inputAxis.x += 1.0f; }
 
 		if (event.type == sf::Event::MouseButtonPressed)
 		{
@@ -348,11 +292,25 @@ void Game::sUserInput()
 
 int Game::getRandomInt(int min, int max) const
 {
-	srand(time(NULL));
 	int diff = 1 + max - min;
 	int r = rand() % diff;
 	r += min;
 	return r;
+}
+
+float Game::getRandomFloat(float min, float max) const
+{
+	float random_0_to_1 = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
+
+	return min + random_0_to_1 * (max - min);
+}
+
+Vec2 Game::getRandomPositionInBorder(int radius) const
+{
+	int x = getRandomInt(radius, m_windowConfig.W - radius);
+	int y = getRandomInt(radius, m_windowConfig.H - radius);
+	Vec2 vec(x, y);
+	return vec;
 }
 
 // void collisions()

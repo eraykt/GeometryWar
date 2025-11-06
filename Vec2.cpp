@@ -79,3 +79,18 @@ float Vec2::length() const
 {
 	return std::sqrt(x * x + y * y);
 }
+
+Vec2 Vec2::normalize() const
+{
+	Vec2 result;
+
+	float len = length();
+
+	if (len > 0.0f)
+	{
+		result.x = this->x / len;
+		result.y = this->y / len;
+	}
+
+	return result;
+}

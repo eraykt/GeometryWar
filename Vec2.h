@@ -34,7 +34,7 @@ public:
 	[[nodiscard]] float dist(const Vec2& v) const;
 
 	[[nodiscard]] float length() const;
-	// void normalize()
+	Vec2 normalize() const;
 };
 
 #endif // VEC2_H

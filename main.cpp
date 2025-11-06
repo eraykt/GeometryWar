@@ -12,9 +12,9 @@ extern "C" {
 
 int main()
 {
+	srand(time(NULL));
 	Game g("config.txt");
 
-	std::cout << g.getRandomInt(1, 5);
 	g.spawnEnemy();
 
 	g.run();

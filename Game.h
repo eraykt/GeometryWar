@@ -83,6 +83,8 @@ public:
 	void spawnSpecialWeapon(std::shared_ptr<Entity> entity);
 
 	int getRandomInt(int min, int max) const;
+	float getRandomFloat(float min, float max) const;
+	Vec2 getRandomPositionInBorder(int radius) const;
 };
 
 #endif //GAME_H
