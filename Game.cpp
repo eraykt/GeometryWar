@@ -244,7 +244,7 @@ void Game::sCollision()
 //    }
 
 	// Player border clamp
-	auto playerPos = m_player->cTransform->pos;
+	auto& playerPos = m_player->cTransform->pos;
 	auto playerRadius = m_player->cCollision->radius;
 
 	if (playerPos.x < playerRadius) { playerPos.x = playerRadius; }
@@ -350,20 +350,14 @@ void Game::drawEntityList(const EntityVec& entities)
 		ImGui::PopStyleColor(1);
 
 		ImGui::SameLine();
-		ImGui::Text(std::to_string(e->id()).c_str());
-		ImGui::SameLine(70);
 
-		ImGui::Text(e->tag().c_str());
 
-		ImGui::SameLine(120);
 
-		stringBuffer = "(" +
-			std::to_string(static_cast<int>(e->cTransform->pos.x)) +
-			", " +
-			std::to_string(static_cast<int>(e->cTransform->pos.y)) +
-			")";
-
-		ImGui::Text(stringBuffer.c_str());
+		ImGui::Text("%d\t%s\t(%d,%d)",
+			e->id(),
+			e->tag().c_str(),
+			static_cast<int>(e->cTransform->pos.x),
+			static_cast<int>(e->cTransform->pos.y));
 	}
 }
 
