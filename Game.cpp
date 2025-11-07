@@ -241,62 +241,59 @@ void Game::sLifespan()
 
 void Game::sCollision()
 {
-	// Bullet collision check
-	static float dist = 0.0f;
+	static float dist = 0;
+	auto& enemies = m_entities.getEntities("enemy");
+	auto& smallEnemies = m_entities.getEntities("smallEnemy");
+
+	std::vector<std::shared_ptr<Entity>> allEnemies;
+	allEnemies.insert(allEnemies.end(), enemies.begin(), enemies.end());
+	allEnemies.insert(allEnemies.end(), smallEnemies.begin(), smallEnemies.end());
+
 	for (auto& bullet : m_entities.getEntities("bullet"))
 	{
-		for (auto& e : m_entities.getEntities("enemy"))
-		{
-			dist = bullet->cTransform->pos.dist(e->cTransform->pos);
-			if (dist < bullet->cCollision->radius + e->cCollision->radius)
-			{
-				spawnSmallEnemies(e);
-				addScore(e->cScore->score);
-				e->destroy();
-				bullet->destroy();
-			}
-		}
+		if (!bullet->isActive()) { continue; }
 
-		for (auto& e : m_entities.getEntities("smallEnemy"))
+		for (auto& enemy : allEnemies)
 		{
-			dist = bullet->cTransform->pos.dist(e->cTransform->pos);
-			if (dist < bullet->cCollision->radius + e->cCollision->radius)
+			if (!enemy->isActive()) { continue; }
+
+			float dist = bullet->cTransform->pos.dist(enemy->cTransform->pos);
+
+			if (dist < bullet->cCollision->radius + enemy->cCollision->radius)
 			{
-				addScore(e->cScore->score);
-				e->destroy();
+				if (enemy->tag() == "enemy")
+				{
+					spawnSmallEnemies(enemy);
+				}
+
+				addScore(enemy->cScore->score);
+				enemy->destroy();
 				bullet->destroy();
+
+				break;
 			}
 		}
 	}
 
-	// Player border clamp
 	auto& playerPos = m_player->cTransform->pos;
 	auto playerRadius = m_player->cCollision->radius;
-
 	if (playerPos.x < playerRadius) { playerPos.x = playerRadius; }
 	else if (playerPos.x + playerRadius > m_windowConfig.W) { playerPos.x = m_windowConfig.W - playerRadius; }
 	if (playerPos.y < playerRadius) { playerPos.y = playerRadius; }
 	else if (playerPos.y + playerRadius > m_windowConfig.H) { playerPos.y = m_windowConfig.H - playerRadius; }
 
 
-	for (auto& e : m_entities.getEntities("enemy"))
+	for (auto& enemy : allEnemies)
 	{
-		// Enemy border clamp
-		resolveBorderCollision(e);
-		dist = e->cTransform->pos.dist(m_player->cTransform->pos);
-		if (dist < m_player->cCollision->radius + e->cCollision->radius)
-		{
-			e->destroy();
-		}
-	}
+		if (!enemy->isActive()) { continue; }
 
-	for (auto& e : m_entities.getEntities("smallEnemy"))
-	{
-		resolveBorderCollision(e);
-		dist = e->cTransform->pos.dist(m_player->cTransform->pos);
-		if (dist < m_player->cCollision->radius + e->cCollision->radius)
+		resolveBorderCollision(enemy);
+
+		float dist = enemy->cTransform->pos.dist(m_player->cTransform->pos);
+		if (dist < m_player->cCollision->radius + enemy->cCollision->radius)
 		{
-			e->destroy();
+			m_player->destroy();
+			spawnPlayer();
 		}
 	}
 }
