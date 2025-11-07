@@ -89,6 +89,7 @@ void Game::run()
 		sMovement();
 		sCollision();
 		sUserInput();
+		sLifespan();
 		sGUI();
 		sRender();
 
@@ -155,6 +156,21 @@ void Game::spawnBullet(std::shared_ptr<Entity> entity, const Vec2& target)
 	// TODO: implement the spawning of a bullet which travels toward target
 	// - bullet speed is given as a scalar speed
 	// - you must set the velocity by using formula in notes
+
+	auto bullet = m_entities.addEntity("bullet");
+
+	Vec2 dir = (target - entity->cTransform->pos).normalize();
+
+	bullet->cTransform = std::make_shared<CTransform>(entity->cTransform->pos, dir * m_bulletConfig.S, 0.0f);
+
+	bullet->cShape = std::make_shared<CShape>(m_bulletConfig.SR, m_bulletConfig.V,
+		sf::Color(m_bulletConfig.FR, m_bulletConfig.FG, m_bulletConfig.FB),
+		sf::Color(m_bulletConfig.OR, m_bulletConfig.OG, m_bulletConfig.OB),
+		m_bulletConfig.OT);
+
+	bullet->cCollision = std::make_shared<CCollision>(m_bulletConfig.CR);
+
+	bullet->cLifespan = std::make_shared<CLifespan>(m_bulletConfig.L);
 }
 
 void Game::spawnSpecialWeapon(std::shared_ptr<Entity> entity)
@@ -191,6 +207,28 @@ void Game::sLifespan()
 	// - if entity has > 0 remaining lifespan, subtract 1
 	// - if it has lifespan and is alive scale its alpha channel properly
 	// - if it has lifespan and its time is up destroy the entity
+
+	for (auto& e : m_entities.getEntities())
+	{
+		if (e->cLifespan)
+		{
+			if (e->cLifespan->remaining > 0)
+			{
+				e->cLifespan->remaining--;
+				int alpha = ((float)e->cLifespan->remaining / (float)e->cLifespan->total) * 255;
+				auto colorFill = e->cShape->circle.getFillColor();
+				auto colorOutline = e->cShape->circle.getOutlineColor();
+				colorFill.a = alpha;
+				colorOutline.a = alpha;
+				e->cShape->circle.setFillColor(colorFill);
+				e->cShape->circle.setOutlineColor(colorOutline);
+			}
+			else
+			{
+				e->destroy();
+			}
+		}
+	}
 }
 
 void Game::sCollision()
@@ -314,9 +352,7 @@ void Game::sUserInput()
 
 			if (event.mouseButton.button == sf::Mouse::Left)
 			{
-				std::cout << "Left Mouse Button Clicked at(" << event.mouseButton.x
-					<< ", " << event.mouseButton.y << ")\n";
-				// TODO: call spawnBullet here
+				spawnBullet(m_player, Vec2(event.mouseButton.x, event.mouseButton.y));
 			}
 
 			if (event.mouseButton.button == sf::Mouse::Right)

@@ -1,5 +1,4 @@
 #include "EntityManager.h"
-
 EntityManager::EntityManager() = default;
 
 // called at beginning of each frame by game engine
@@ -26,18 +25,30 @@ void EntityManager::update()
 
 void EntityManager::removeDeadEntities(EntityVec& vec)
 {
-	// TODO: remove all dead entities from the input vector
-	// this is called by the update() function
+	m_entities.erase(
+		std::remove_if(m_entities.begin(), m_entities.end(),
+			[](const std::shared_ptr<Entity>& e)
+			{
+				return !e->m_active;
+			}
+		),
+		m_entities.end()
+	);
 
-	// for (auto e: m_entities)
-	// {
-	//     // if e is dead, remove it from m_entities
-	//     // if e is dead, remove it from m_entityMap[e->tag()]
-	//     if (! e->m_alive)
-	//     {
-	//         // ...
-	//     }
-	// }
+	for (auto const& e : m_entityMap)
+	{
+		EntityVec& map = m_entityMap[e.first];
+
+		map.erase(
+			std::remove_if(map.begin(), map.end(),
+				[](const std::shared_ptr<Entity>& e)
+				{
+					return !e->m_active;
+				}
+			),
+			map.end()
+		);
+	}
 }
 
 std::shared_ptr<Entity> EntityManager::addEntity(const std::string& tag)
