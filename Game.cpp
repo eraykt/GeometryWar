@@ -32,6 +32,7 @@ void Game::init(const std::string& path)
 			m_text.setFont(m_font);
 			m_text.setCharacterSize(fontSize);
 			m_text.setFillColor(color);
+			m_text.setString("Score: " + std::to_string(m_score));
 		}
 
 		else if (command == "Player")
@@ -250,6 +251,18 @@ void Game::sCollision()
 			if (dist < bullet->cCollision->radius + e->cCollision->radius)
 			{
 				spawnSmallEnemies(e);
+				addScore(e->cScore->score);
+				e->destroy();
+				bullet->destroy();
+			}
+		}
+
+		for (auto& e : m_entities.getEntities("smallEnemy"))
+		{
+			dist = bullet->cTransform->pos.dist(e->cTransform->pos);
+			if (dist < bullet->cCollision->radius + e->cCollision->radius)
+			{
+				addScore(e->cScore->score);
 				e->destroy();
 				bullet->destroy();
 			}
@@ -266,15 +279,25 @@ void Game::sCollision()
 	else if (playerPos.y + playerRadius > m_windowConfig.H) { playerPos.y = m_windowConfig.H - playerRadius; }
 
 
-	// Enemy border clamp
 	for (auto& e : m_entities.getEntities("enemy"))
 	{
+		// Enemy border clamp
 		resolveBorderCollision(e);
+		dist = e->cTransform->pos.dist(m_player->cTransform->pos);
+		if (dist < m_player->cCollision->radius + e->cCollision->radius)
+		{
+			e->destroy();
+		}
 	}
 
 	for (auto& e : m_entities.getEntities("smallEnemy"))
 	{
 		resolveBorderCollision(e);
+		dist = e->cTransform->pos.dist(m_player->cTransform->pos);
+		if (dist < m_player->cCollision->radius + e->cCollision->radius)
+		{
+			e->destroy();
+		}
 	}
 }
 
@@ -301,6 +324,12 @@ void Game::resolveBorderCollision(const std::shared_ptr<Entity> e)
 		e->cTransform->velocity.y *= -1.0f;
 		e->cTransform->pos.y = m_windowConfig.H - e->cCollision->radius;
 	}
+}
+
+void Game::addScore(int toBeAdded)
+{
+	m_score += toBeAdded;
+	m_text.setString("Score: " + std::to_string(m_score));
 }
 
 void Game::sEnemySpawner()
@@ -413,6 +442,8 @@ void Game::sRender()
 		e->cShape->circle.setRotation(e->cTransform->angle);
 		m_window.draw(e->cShape->circle);
 	}
+
+	m_window.draw(m_text);
 
 	// draw the ui last
 	ImGui::SFML::Render(m_window);

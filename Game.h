@@ -69,6 +69,7 @@ class Game
 	void drawEntityList(const EntityVec& entities);
 
 	void resolveBorderCollision(const std::shared_ptr<Entity> e);
+	void addScore(int toBeAdded);
 
 
 public:
