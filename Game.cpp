@@ -146,13 +146,6 @@ void Game::spawnEnemy()
 // spawns the small enemies when a big one (input entity e) explodes
 void Game::spawnSmallEnemies(std::shared_ptr<Entity> e)
 {
-	// TODO: spawn small enemies at the location of the input enemy e
-
-	// when we create the smaller enemy, we have to read the values of the original enemy
-	// - spawn a number of small enemies equal to the vertices of the original enemy
-	// - set each small enemy to the same color as the original, half the size
-	// - small enemies are worth double points of the original enemy
-
 	int verts = e->cShape->circle.getPointCount();
 
 	for (size_t i = 0; i < verts; i++)
@@ -285,7 +278,6 @@ void Game::sCollision()
 	}
 }
 
-
 void Game::resolveBorderCollision(const std::shared_ptr<Entity> e)
 {
 	if (e->cTransform->pos.x < e->cCollision->radius)
@@ -402,8 +394,6 @@ void Game::drawEntityList(const EntityVec& entities)
 
 		ImGui::SameLine();
 
-
-
 		ImGui::Text("%d\t%s\t(%d,%d)",
 			e->id(),
 			e->tag().c_str(),
@@ -414,8 +404,6 @@ void Game::drawEntityList(const EntityVec& entities)
 
 void Game::sRender()
 {
-	// TODO: change the code below to draw ALL of the entities
-	// sample drawing of the player Entity that we have created
 	m_window.clear();
 
 	for (auto& e : m_entities.getEntities())
@@ -434,11 +422,6 @@ void Game::sRender()
 
 void Game::sUserInput()
 {
-	// TODO: handle user input here
-	// note that you should only be setting the player's input component variables here
-	// you shold not implement the player's movement logic here
-	// the movement system will read the variables you set in this functioin
-
 	sf::Event event;
 	while (m_window.pollEvent(event))
 	{
@@ -482,7 +465,6 @@ void Game::sUserInput()
 	}
 }
 
-
 int Game::getRandomInt(int min, int max) const
 {
 	int diff = 1 + max - min;
@@ -505,14 +487,3 @@ Vec2 Game::getRandomPositionInBorder(int radius) const
 	Vec2 vec(x, y);
 	return vec;
 }
-
-// void collisions()
-// {
-// for (auto b : m_entities.getEntities("bullet"))
-// for (auto e : m_entities.getEntities("enemy"))
-//     if (Physics::CheckCollision(b, e))
-//     {
-//     b->destroy();
-//     e->destroy();
-//     }
-// }
