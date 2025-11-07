@@ -276,29 +276,39 @@ void Game::sCollision()
 	// Enemy border clamp
 	for (auto& e : m_entities.getEntities("enemy"))
 	{
-		if (e->cTransform->pos.x < e->cCollision->radius)
-		{
-			e->cTransform->velocity.x *= -1.0f;
-			e->cTransform->pos.x = e->cCollision->radius;
-		}
-		else if (e->cTransform->pos.x + e->cCollision->radius > m_windowConfig.W)
-		{
-			e->cTransform->velocity.x *= -1.0f;
-			e->cTransform->pos.x = m_windowConfig.W - e->cCollision->radius;
-		}
-
-		if (e->cTransform->pos.y < e->cCollision->radius)
-		{
-			e->cTransform->velocity.y *= -1.0f;
-			e->cTransform->pos.y = e->cCollision->radius;
-		}
-		else if (e->cTransform->pos.y + e->cCollision->radius > m_windowConfig.H)
-		{
-			e->cTransform->velocity.y *= -1.0f;
-			e->cTransform->pos.y = m_windowConfig.H - e->cCollision->radius;
-		}
+		resolveBorderCollision(e);
 	}
 
+	for (auto& e : m_entities.getEntities("smallEnemy"))
+	{
+		resolveBorderCollision(e);
+	}
+}
+
+
+void Game::resolveBorderCollision(const std::shared_ptr<Entity> e)
+{
+	if (e->cTransform->pos.x < e->cCollision->radius)
+	{
+		e->cTransform->velocity.x *= -1.0f;
+		e->cTransform->pos.x = e->cCollision->radius;
+	}
+	else if (e->cTransform->pos.x + e->cCollision->radius > m_windowConfig.W)
+	{
+		e->cTransform->velocity.x *= -1.0f;
+		e->cTransform->pos.x = m_windowConfig.W - e->cCollision->radius;
+	}
+
+	if (e->cTransform->pos.y < e->cCollision->radius)
+	{
+		e->cTransform->velocity.y *= -1.0f;
+		e->cTransform->pos.y = e->cCollision->radius;
+	}
+	else if (e->cTransform->pos.y + e->cCollision->radius > m_windowConfig.H)
+	{
+		e->cTransform->velocity.y *= -1.0f;
+		e->cTransform->pos.y = m_windowConfig.H - e->cCollision->radius;
+	}
 }
 
 void Game::sEnemySpawner()
