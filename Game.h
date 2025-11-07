@@ -48,6 +48,8 @@ class Game
 	bool m_running = true;
 	int m_lastEnemySpawnTime;
 
+	bool m_spawnerActive = true;
+
 	void init(const std::string& path);
 
 	void sMovement();
