@@ -290,9 +290,81 @@ void Game::sGUI()
 {
 	ImGui::Begin("Geometry Wars");
 
-	ImGui::Text("Stuff Goes Here");
+	if (ImGui::BeginTabBar("Tabs"))
+	{
+		if (ImGui::BeginTabItem("Systems"))
+		{
+			ImGui::Text("Systems will be implemented here.");
+
+			ImGui::EndTabItem();
+		}
+
+		if (ImGui::BeginTabItem("Entities"))
+		{
+
+			if (ImGui::CollapsingHeader("Mapped Entities"))
+			{
+				ImGui::Indent();
+				for (auto const& dict : m_entities.getEntityMap())
+				{
+					if (ImGui::CollapsingHeader(dict.first.c_str()))
+					{
+						ImGui::Indent();
+						drawEntityList(dict.second);
+						ImGui::Unindent();
+					}
+				}
+				ImGui::Unindent();
+			}
+			if (ImGui::CollapsingHeader("All Entities"))
+			{
+				ImGui::Indent();
+				drawEntityList(m_entities.getEntities());
+				ImGui::Unindent();
+			}
+			ImGui::EndTabItem();
+		}
+		ImGui::EndTabBar();
+	}
 
 	ImGui::End();
+}
+
+void Game::drawEntityList(const EntityVec& entities)
+{
+	static std::string stringBuffer;
+
+	for (auto& e : entities)
+	{
+		stringBuffer = "D##" + std::to_string(e->id());
+
+		auto color = e->cShape->circle.getFillColor();
+
+		ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(color.r / 255.0f, color.g / 255.0f, color.b / 255.0f));
+
+		if (ImGui::Button(stringBuffer.c_str()))
+		{
+			e->destroy();
+		}
+
+		ImGui::PopStyleColor(1);
+
+		ImGui::SameLine();
+		ImGui::Text(std::to_string(e->id()).c_str());
+		ImGui::SameLine(70);
+
+		ImGui::Text(e->tag().c_str());
+
+		ImGui::SameLine(120);
+
+		stringBuffer = "(" +
+			std::to_string(static_cast<int>(e->cTransform->pos.x)) +
+			", " +
+			std::to_string(static_cast<int>(e->cTransform->pos.y)) +
+			")";
+
+		ImGui::Text(stringBuffer.c_str());
+	}
 }
 
 void Game::sRender()

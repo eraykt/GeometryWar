@@ -64,6 +64,8 @@ class Game
 
 	void sCollision();
 
+	void drawEntityList(const EntityVec& entities);
+
 public:
 	Game(const std::string& config);
 
